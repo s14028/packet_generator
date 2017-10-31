@@ -2,7 +2,7 @@
 
 Utility used for generating packet structure.
 
-##Purpose
+## Purpose
 
 When you starting to develop your own protocol, one of the most important part of developing is building your packet structure. The Packet Generator allows you
 to define your packet members and bit chunk size of those members. You can deploy your packet structure into your programming language and use that structure for
@@ -12,14 +12,14 @@ reading packets you have recieved or writing your packet insides to buffer. You 
 
 In order to define your packet structure, you have to create structure file *.pg.
 Which will basicly gonna look like:
-
+```
 MyPacketName
 {
   MyFirstMember:10
   MySecondMember:30
   MyThirdMember:50
 }
-
+```
 So packet generator will make you a structure, which will be named as "MyPacketName" and will have members:
 
 MyFirstMember which will be at the beginning of your packet and will have 10 bits.
