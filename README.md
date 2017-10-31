@@ -29,9 +29,9 @@ MyThirdMember which will be at the end of your packet and will have 50 bits.
 Now, when you defined your packet structure, you can run generator.py
 
 At your command line like so:
-
-python3 generator.py -language YourLanguage -input input.pg -output yourOutputFile
-
+```
+python3 generator.py -language YourLanguage -input input.pg -output output
+```
 And now you ready to use your packet structure in your project.
 
 The interface of packet structure consists of 4 public methods:
