@@ -60,7 +60,7 @@ class JavaLanguage(ilanguage.ILanguage):
         return string
 
 
-    def createMethod(self, visibility, name, _return,*params):
+    def createMethod(self, visibility, name, _return, *params):
         string = self.parseParams(*params)
 
         visibility = self.visibility[visibility]
@@ -183,3 +183,11 @@ class JavaLanguage(ilanguage.ILanguage):
 
     def setVisibility(self, variable, visibility):
         variable.text = "{} {}".format(self.visibility[visibility], variable.text)
+
+    def returnConstexpr(self, expr):
+        return instruction.Instruction("return {};".format(expr))
+
+    def staticMethod(self, method):
+        method.text = "static {}".format(method.text)
+
+        return method

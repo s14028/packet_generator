@@ -142,27 +142,27 @@ class Interpreter:
 
         function += language.glue()
 
-        loopContext = language.loop("i", language.arrayaccess("array", 3), ilanguage.ILanguage.Compare.Less)
+        loopContext = language.loop("i", language.arrayaccess("array", 2), ilanguage.ILanguage.Compare.Less)
         function += loopContext
 
         loopContext += language.set(language.arrayaccess(language.objectmember(self.bufferName), "i"), "0")
         loopContext += language.assign(language.add("i", "1"))
 
-        ifsection = language.ifsection(language.arrayaccess("array", 0), language.arrayaccess("array", 0), ilanguage.ILanguage.Compare.Eq)
+        ifsection = language.ifsection(language.arrayaccess("array", 0), language.arrayaccess("array", 2), ilanguage.ILanguage.Compare.Eq)
         function += ifsection
 
         ifsection += language.arrayaccessassign(language.objectmember(self.bufferName), language.arrayaccess("array", 0), "copy", var.Variable.Type.Variable, 32)
-        ifsection += language.assign(language.rightshift("copy", "8 - {}".format(language.arrayaccess("array", 1))))
         ifsection += language.assign(language.leftshift("copy", "8 - {}".format(language.arrayaccess("array", 1))))
+        ifsection += language.assign(language.rightshift("copy", "8 - {}".format(language.arrayaccess("array", 1))))
 
         ifsection += language.glue()
 
         ifsection += language.assign(
-            language.leftshift(
+            language.rightshift(
                 language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 0)),
                 language.arrayaccess("array", 3)))
         ifsection += language.assign(
-            language.rightshift(
+            language.leftshift(
                 language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 0)),
                 language.arrayaccess("array", 3)))
         ifsection += language.assign(
@@ -174,20 +174,20 @@ class Interpreter:
         function += elsesection
 
         elsesection += language.assign(
+            language.leftshift(
+                language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 0)),
+                "8 - {}".format(language.arrayaccess("array", 1))))
+        elsesection += language.assign(
             language.rightshift(
                 language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 0)),
                 "8 - {}".format(language.arrayaccess("array", 1))))
         elsesection += language.assign(
-            language.leftshift(
-                language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 0)),
-                "8 - {}".format(language.arrayaccess("array", 1))))
-        elsesection += language.assign(
-            language.leftshift(
-                language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 0)),
+            language.rightshift(
+                language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 2)),
                 "8 - {}".format(language.arrayaccess("array", 3))))
         elsesection += language.assign(
-            language.rightshift(
-                language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 0)),
+            language.leftshift(
+                language.arrayaccess(language.objectmember(self.bufferName), language.arrayaccess("array", 2)),
                 "8 - {}".format(language.arrayaccess("array", 3))))
 
 
@@ -208,7 +208,7 @@ class Interpreter:
         destinationLowerBit = language.arrayaccess("destinationBounds", 1)
 
         loopContext = language.loop(sourceLowerBound, sourceUpperBound,
-                                    ilanguage.ILanguage.Compare.LessEq)
+                                    ilanguage.ILanguage.Compare.Less)
         function += loopContext
 
         maximum = language.reserve("max", var.Variable.Type.Variable, 32,
@@ -217,8 +217,8 @@ class Interpreter:
         loopContext += maximum.init()
 
         loopContext += language.arrayaccessassign("source", sourceLowerBound, "chunk", var.Variable.Type.Variable, 32)
-        loopContext += language.assign(language.leftshift("chunk", sourceLowerBit))
-        loopContext += language.assign(language.rightshift("chunk", destinationLowerBit))
+        loopContext += language.assign(language.rightshift("chunk", sourceLowerBit))
+        loopContext += language.assign(language.leftshift("chunk", destinationLowerBit))
         loopContext += language.assign(language.add(language.arrayaccess("destination", destinationLowerBound), "chunk"))
 
         loopContext += language.assign(language.add(sourceLowerBit, "8 - max"))
@@ -235,6 +235,49 @@ class Interpreter:
         ifsection = language.ifsection(destinationLowerBit, 8, ilanguage.ILanguage.Compare.Eq)
         loopContext += ifsection
         ifsection += language.assign(language.add(destinationLowerBound, 1))
+
+        function += language.glue()
+
+        function += language.arrayaccessassign("source", sourceLowerBound, "chunk", var.Variable.Type.Variable, 32)
+        function += language.reserve("d", var.Variable.Type.Variable, 32, "8 - {}".format(destinationLowerBit))
+        function += function.subcontexts[-1:][0].init()
+
+        function += language.glue()
+
+        ifsection = language.ifsection("d", "{} - {}".format(sourceUpperBit, sourceLowerBit), ilanguage.ILanguage.Compare.Less)
+        function += ifsection
+
+        ifsection += language.assign(language.leftshift("chunk", destinationLowerBit))
+        ifsection += language.assign(language.add(language.arrayaccess("destination", destinationLowerBound), "chunk"))
+
+        ifsection += language.glue()
+
+        ifsection += language.assign(language.add(sourceLowerBit, "8 - {}".format(destinationLowerBit)))
+
+        ifsection += language.glue()
+
+        ifsection += language.assign(language.add(destinationLowerBound, 1))
+        ifsection += language.set(destinationLowerBit, 0)
+
+        function += language.glue()
+
+        function += language.set("chunk", language.arrayaccess("source", language.arrayaccess("sourceBounds", 0)))
+        function += language.assign(
+            language.leftshift("chunk", "8 - {}".format(sourceUpperBit)))
+        function += language.assign(
+            language.rightshift("chunk", "({} + (8 - {})) - {}".format(sourceLowerBit, sourceUpperBit, destinationLowerBit)))
+
+        function += language.glue()
+
+        function += language.assign(language.add(language.arrayaccess("destination", destinationLowerBound), "chunk"))
+
+
+    def size(self, language, context):
+        function = language.createMethod(ilanguage.ILanguage.Visibility.public, "size", 32)
+        funtion = language.staticMethod(function)
+        context += function
+
+        function += language.returnConstexpr("{}".format(self.countBytes()))
 
     def initStatic(self, language, static, context=None):
         staticontext = language.staticontext()
@@ -288,10 +331,15 @@ class Interpreter:
 
         self.set(language, structContext)
         structContext += language.glue()
+
+        self.size(language, structContext)
+        structContext += language.glue()
+
         output = ""
         for i in globalContext:
             output = i(output, ("{", "}"))
             output += "\n"
         output = output[:-1]
+
 
         return output

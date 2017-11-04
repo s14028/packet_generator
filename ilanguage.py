@@ -99,3 +99,7 @@ class ILanguage:
         raise NotImplementedError()
     def setVisibility(self, variable, visibility):
         raise NotImplementedError()
+    def returnConstexpr(self, expr):
+        raise NotImplementedError()
+    def staticMethod(self, method):
+        raise NotImplementedError()
